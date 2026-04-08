@@ -1,24 +1,24 @@
 export function PlatformIcons() {
   const platforms = [
-    { name: "YouTube", color: "#FF0000", icon: YouTubeIcon },
-    { name: "TikTok", color: "#000000", icon: TikTokIcon },
-    { name: "Instagram", color: "#E4405F", icon: InstagramIcon },
-    { name: "Twitter", color: "#000000", icon: TwitterIcon },
-    { name: "Facebook", color: "#1877F2", icon: FacebookIcon },
-    { name: "Reddit", color: "#FF4500", icon: RedditIcon },
-    { name: "Vimeo", color: "#1AB7EA", icon: VimeoIcon },
+    { name: "YouTube", color: "#FF0000", bg: "bg-red-50", icon: YouTubeIcon },
+    { name: "TikTok", color: "#000000", bg: "bg-slate-50", icon: TikTokIcon },
+    { name: "Instagram", color: "#E4405F", bg: "bg-pink-50", icon: InstagramIcon },
+    { name: "Twitter", color: "#000000", bg: "bg-slate-50", icon: TwitterIcon },
+    { name: "Facebook", color: "#1877F2", bg: "bg-blue-50", icon: FacebookIcon },
+    { name: "Reddit", color: "#FF4500", bg: "bg-orange-50", icon: RedditIcon },
+    { name: "Vimeo", color: "#1AB7EA", bg: "bg-sky-50", icon: VimeoIcon },
   ];
 
   return (
-    <div className="flex items-center gap-4 flex-wrap">
+    <div className="flex items-center gap-2 flex-wrap">
       {platforms.map((p) => (
         <div
           key={p.name}
-          className="flex items-center gap-1.5 text-gray-400"
+          className={`platform-pill inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full ${p.bg} border border-black/[0.04]`}
           title={p.name}
         >
-          <p.icon className="w-4 h-4" color={p.color} />
-          <span className="text-xs font-medium">{p.name}</span>
+          <p.icon className="w-3.5 h-3.5" color={p.color} />
+          <span className="text-xs font-medium text-slate-600">{p.name}</span>
         </div>
       ))}
     </div>

@@ -15,6 +15,9 @@ const config: Config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      height: {
+        "13": "3.25rem",
+      },
     },
   },
   plugins: [],
