@@ -12,12 +12,11 @@ interface Format {
   quality: string;
   ext: string;
   filesize: number | null;
-  itag: string;
+  formatStr: string;
 }
 
 interface VideoInfo {
   title: string;
-  thumbnail: string | null;
   duration: string | null;
   platform: string;
   formats: Format[];
@@ -108,43 +107,30 @@ export default function Home() {
     [url, fetchInfo]
   );
 
-  const handleDownload = useCallback(async () => {
-    if (!selectedFormat || !url) return;
+  const handleDownload = useCallback(() => {
+    if (!selectedFormat || !url || !info) return;
 
     setDownloading(true);
-    try {
-      const res = await fetch(`${API}/api/download`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          url: url.trim(),
-          itag: selectedFormat.itag,
-          ext: selectedFormat.ext,
-        }),
-      });
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Failed to get download link.");
-      }
+    const params = new URLSearchParams({
+      url: url.trim(),
+      format: selectedFormat.formatStr,
+      ext: selectedFormat.ext,
+      filename: info.title || "download",
+    });
 
-      const { directUrl, filename } = await res.json();
+    const downloadUrl = `${API}/api/download?${params.toString()}`;
 
-      const a = document.createElement("a");
-      a.href = directUrl;
-      a.download = filename;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Download failed.";
-      toast.error(msg);
-    } finally {
-      setDownloading(false);
-    }
-  }, [selectedFormat, url]);
+    const a = document.createElement("a");
+    a.href = downloadUrl;
+    a.download = `${info.title || "download"}.${selectedFormat.ext}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    // Reset button state after a short delay
+    setTimeout(() => setDownloading(false), 3000);
+  }, [selectedFormat, url, info]);
 
   const reset = useCallback(() => {
     setState("empty");
@@ -306,13 +292,9 @@ export default function Home() {
                     Fetching video info...
                   </span>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="w-full sm:w-52 h-32 rounded-xl skeleton" />
-                  <div className="flex-1 space-y-3 py-1">
-                    <div className="h-5 w-4/5 skeleton" />
-                    <div className="h-4 w-2/5 skeleton" />
-                    <div className="h-4 w-3/5 skeleton" />
-                  </div>
+                <div className="space-y-3">
+                  <div className="h-5 w-4/5 skeleton" />
+                  <div className="h-4 w-2/5 skeleton" />
                 </div>
                 <div className="mt-6 space-y-3">
                   <div className="h-12 w-full skeleton" />
@@ -327,33 +309,21 @@ export default function Home() {
           {state === "result" && info && (
             <div className="pt-8 sm:pt-12 fade-in-up">
               <div className="glass-card-elevated rounded-2xl p-5 sm:p-7">
-                {/* Video preview */}
-                <div className="flex flex-col sm:flex-row gap-5">
-                  {info.thumbnail && (
-                    <div className="w-full sm:w-52 flex-shrink-0">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={info.thumbnail}
-                        alt={info.title}
-                        className="w-full h-32 object-cover rounded-xl bg-slate-100 shadow-sm"
-                      />
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-base sm:text-lg font-semibold text-slate-900 leading-snug line-clamp-2">
-                      {info.title}
-                    </h2>
-                    <div className="mt-3 flex items-center gap-2 flex-wrap">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">
-                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                        {info.platform}
+                {/* Video title + meta */}
+                <div>
+                  <h2 className="text-base sm:text-lg font-semibold text-slate-900 leading-snug line-clamp-2">
+                    {info.title}
+                  </h2>
+                  <div className="mt-3 flex items-center gap-2 flex-wrap">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                      {info.platform}
+                    </span>
+                    {info.duration && (
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 text-slate-500 border border-slate-100">
+                        {info.duration}
                       </span>
-                      {info.duration && (
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 text-slate-500 border border-slate-100">
-                          {info.duration}
-                        </span>
-                      )}
-                    </div>
+                    )}
                   </div>
                 </div>
 
@@ -406,11 +376,11 @@ export default function Home() {
 
                   {/* Format options */}
                   <div className="space-y-2">
-                    {currentFormats.map((f) => (
+                    {currentFormats.map((f, i) => (
                       <label
-                        key={`${f.itag}-${f.quality}`}
+                        key={`${f.formatStr}-${i}`}
                         className={`format-option flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer ${
-                          selectedFormat?.itag === f.itag
+                          selectedFormat?.formatStr === f.formatStr
                             ? "border-blue-500 bg-blue-50/80 shadow-sm shadow-blue-500/10"
                             : "border-slate-100 hover:border-slate-200 bg-white"
                         }`}
@@ -418,32 +388,25 @@ export default function Home() {
                         <div className="flex items-center gap-3">
                           <div
                             className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition ${
-                              selectedFormat?.itag === f.itag
+                              selectedFormat?.formatStr === f.formatStr
                                 ? "border-blue-500"
                                 : "border-slate-300"
                             }`}
                           >
-                            {selectedFormat?.itag === f.itag && (
+                            {selectedFormat?.formatStr === f.formatStr && (
                               <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />
                             )}
                           </div>
                           <input
                             type="radio"
                             name="format"
-                            checked={selectedFormat?.itag === f.itag}
+                            checked={selectedFormat?.formatStr === f.formatStr}
                             onChange={() => setSelectedFormat(f)}
                             className="sr-only"
                           />
                           <span className="text-sm font-semibold text-slate-900">
-                            {f.type === "video"
-                              ? f.quality
-                              : f.ext.toUpperCase()}
+                            {f.quality}
                           </span>
-                          {f.type === "audio" && (
-                            <span className="text-xs text-slate-500">
-                              {f.quality}
-                            </span>
-                          )}
                         </div>
                         <div className="flex items-center gap-2.5">
                           <span className="inline-flex px-2 py-0.5 rounded-md bg-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
@@ -451,7 +414,7 @@ export default function Home() {
                           </span>
                           {f.filesize && (
                             <span className="text-xs font-medium text-slate-400 tabular-nums">
-                              {formatFileSize(f.filesize)}
+                              ~{formatFileSize(f.filesize)}
                             </span>
                           )}
                         </div>
