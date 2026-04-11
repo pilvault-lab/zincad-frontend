@@ -1,12 +1,12 @@
 export function PlatformIcons() {
   const platforms = [
-    { name: "YouTube", color: "#FF0000", bg: "bg-red-50", icon: YouTubeIcon },
-    { name: "TikTok", color: "#000000", bg: "bg-slate-50", icon: TikTokIcon },
-    { name: "Instagram", color: "#E4405F", bg: "bg-pink-50", icon: InstagramIcon },
-    { name: "Twitter", color: "#000000", bg: "bg-slate-50", icon: TwitterIcon },
-    { name: "Facebook", color: "#1877F2", bg: "bg-blue-50", icon: FacebookIcon },
-    { name: "Reddit", color: "#FF4500", bg: "bg-orange-50", icon: RedditIcon },
-    { name: "Vimeo", color: "#1AB7EA", bg: "bg-sky-50", icon: VimeoIcon },
+    { name: "YouTube", icon: YouTubeIcon, color: "#FF0000" },
+    { name: "TikTok", icon: TikTokIcon, color: "#ffffff" },
+    { name: "Instagram", icon: InstagramIcon, color: "#E4405F" },
+    { name: "Twitter", icon: TwitterIcon, color: "#ffffff" },
+    { name: "Facebook", icon: FacebookIcon, color: "#1877F2" },
+    { name: "Reddit", icon: RedditIcon, color: "#FF4500" },
+    { name: "Vimeo", icon: VimeoIcon, color: "#1AB7EA" },
   ];
 
   return (
@@ -14,11 +14,11 @@ export function PlatformIcons() {
       {platforms.map((p) => (
         <div
           key={p.name}
-          className={`platform-pill inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full ${p.bg} border border-black/[0.04]`}
+          className="platform-pill inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/04 border border-white/08 hover:border-white/15 transition-all"
           title={p.name}
         >
-          <p.icon className="w-3.5 h-3.5" color={p.color} />
-          <span className="text-xs font-medium text-slate-600">{p.name}</span>
+          <p.icon className="w-3.5 h-3.5 flex-shrink-0" color={p.color} />
+          <span className="text-xs font-medium text-slate-400">{p.name}</span>
         </div>
       ))}
     </div>

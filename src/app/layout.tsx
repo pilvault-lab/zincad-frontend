@@ -123,7 +123,7 @@ export default function RootLayout({
       <head>
         <JsonLd />
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <meta name="theme-color" content="#2563eb" />
+        <meta name="theme-color" content="#08090e" />
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
@@ -135,10 +135,15 @@ export default function RootLayout({
         <Toaster
           position="top-center"
           richColors
+          theme="dark"
           toastOptions={{
             style: {
               borderRadius: "12px",
               fontSize: "14px",
+              background: "rgba(15,16,23,0.95)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              color: "#f1f5f9",
+              backdropFilter: "blur(20px)",
             },
           }}
         />
